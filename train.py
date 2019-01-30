@@ -5,7 +5,6 @@ def equal(attr_index, output, label):
     for i in range(len(output)):
         max_index = 0
         max_outlabel = 0
-
         output_slice = 0
         if attr_index == 0:
             output_slice = output[:,0:8]
@@ -34,22 +33,23 @@ def equal(attr_index, output, label):
 
     return equalnum
 
-
 def train(attr_index, epoch, model, optimizer, train_loader):
     model.train()
     loss = fashionLoss(attr_index)
+    lr = 0
+    for para in optimizer.param_groups:
+        lr = para['lr']
+
     for batch_idx, (data, label) in enumerate(train_loader):
         data, label = data.cuda(),label.cuda()
-        #print(data.size())
         optimizer.zero_grad()
         output = model(data)
-        #print(output.size())
         trainloss = loss(output, label)
         trainloss.backward()
         optimizer.step()
         if batch_idx % 10 == 0:
-            print('Trianing attribute:{}\tEpoch:{}\t[batch:{}/{}]\tBatch loss:{:.6f}'.format(
-                attr_index, epoch, batch_idx, len(train_loader), trainloss.item()))
+            print('Attribute: {}\tEpoch: {}\t[batch: {}/{}]\tBatch loss: {:.4f}\tlr: {:.5f}'.format(
+                attr_index, epoch, batch_idx, len(train_loader), trainloss.item(), lr))
 
 
 def evaluate(attr_index, model, test_loader):
@@ -60,13 +60,11 @@ def evaluate(attr_index, model, test_loader):
 
     for data, label in test_loader:
         data, label = data.cuda(),label.cuda()
-        #print(data.size())
         output = model(data)
-        #print(output.size())
         test_loss += loss(output, label).item()
         correct += equal(attr_index, output, label)
 
     test_loss /= len(test_loader)
     accuracy = 100. * correct / (len(test_loader) * test_loader.batch_size)
-    print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.6f}%)'.format(
+    print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)'.format(
         test_loss, correct, len(test_loader) * test_loader.batch_size,accuracy))
