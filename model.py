@@ -68,10 +68,6 @@ class fashionModel(nn.Module):
         self.fc_pant_length_labels = nn.Linear(512 * block.expansion, 6)
         self.fc_skirt_length_labels = nn.Linear(512 * block.expansion, 6)
         self.fc_sleeve_length_labels = nn.Linear(512 * block.expansion, 9)
-        self.fc_collar_design_labels = nn.Linear(512 * block.expansion, 5)
-        self.fc_lapel_design_labels = nn.Linear(512 * block.expansion, 5)
-        self.fc_neck_design_labels = nn.Linear(512 * block.expansion, 5)
-        self.fc_neckline_design_labels = nn.Linear(512 * block.expansion, 10)
         #self.fc = nn.Linear(512 * block.expansion, number_attr)
         nn.init.xavier_uniform(self.fc_coat_length_labels.weight)
         nn.init.constant(self.fc_coat_length_labels.bias, 0)
@@ -81,14 +77,6 @@ class fashionModel(nn.Module):
         nn.init.constant(self.fc_skirt_length_labels.bias, 0)
         nn.init.xavier_uniform(self.fc_sleeve_length_labels.weight)
         nn.init.constant(self.fc_sleeve_length_labels.bias, 0)
-        nn.init.xavier_uniform(self.fc_collar_design_labels.weight)
-        nn.init.constant(self.fc_collar_design_labels.bias, 0)
-        nn.init.xavier_uniform(self.fc_lapel_design_labels.weight)
-        nn.init.constant(self.fc_lapel_design_labels.bias, 0)
-        nn.init.xavier_uniform(self.fc_neck_design_labels.weight)
-        nn.init.constant(self.fc_neck_design_labels.bias, 0)
-        nn.init.xavier_uniform(self.fc_neckline_design_labels.weight)
-        nn.init.constant(self.fc_neckline_design_labels.bias, 0)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -132,15 +120,14 @@ class fashionModel(nn.Module):
         pant_length_labels = self.fc_pant_length_labels(x)
         skirt_length_labels = self.fc_skirt_length_labels(x)
         sleeve_length_labels = self.fc_sleeve_length_labels(x)
-        collar_design_labels = self.fc_collar_design_labels(x)
-        lapel_design_labels = self.fc_lapel_design_labels(x)
-        neck_design_labels = self.fc_neck_design_labels(x)
-        neckline_design_labels = self.fc_neckline_design_labels(x)
 
-        result = torch.cat((coat_length_labels, pant_length_labels, skirt_length_labels, sleeve_length_labels,
-                                collar_design_labels, lapel_design_labels, neck_design_labels, neckline_design_labels), 1)
+        # result = torch.cat((coat_length_labels, pant_length_labels, skirt_length_labels, sleeve_length_labels), 1)
+        #print(coat_length_labels.size())
+        #print(pant_length_labels.size())
+        #print(skirt_length_labels.size())
+        #print(sleeve_length_labels.size())
 
-        return result
+        return coat_length_labels, pant_length_labels, skirt_length_labels, sleeve_length_labels
 
 def creat_model():
     resnet50 = models.resnet50(pretrained = True)

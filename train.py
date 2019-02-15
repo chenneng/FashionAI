@@ -1,68 +1,68 @@
 from loss import fashionLoss
+import torch
 
-def equal(attr_index, output, label):
+def equal(outputN, label):
     equalnum = 0
-    for i in range(len(output)):
-        max_index = 0
-        max_outlabel = 0
-        output_slice = 0
-        if attr_index == 0:
-            output_slice = output[:,0:8]
-        elif attr_index == 1:
-            output_slice = output[:,8:14]
-        elif attr_index == 2:
-            output_slice = output[:,14:20]
-        elif attr_index == 3:
-            output_slice = output[:,20:29]
-        elif attr_index == 4:
-            output_slice = output[:,29:34]
-        elif attr_index == 5:
-            output_slice = output[:,34:39]
-        elif attr_index == 6:
-            output_slice = output[:,39:44]
-        elif attr_index == 7:
-            output_slice = output[:,44:54]
-       
-        for index, outlabels in enumerate(output_slice[i]):
-            if outlabels > max_outlabel:
-                max_outlabel = outlabels
-                max_index = index
 
-        if max_index == label[i].item():
+    output_attr1 = outputN[0]
+    output_attr2 = outputN[1]
+    output_attr3 = outputN[2]
+    output_attr4 = outputN[3]
+
+    for i, output in enumerate(output_attr1):
+        index = torch.argmax(label[i])
+        out_index = 30
+        if index >= 0 and index < 8:
+            out_index = torch.argmax(output_attr1[i]).item()
+        elif index >= 8 and index < 14:
+            out_index = torch.argmax(output_attr2[i]).item() + 8
+        elif index >= 14 and index < 20:
+            out_index = torch.argmax(output_attr3[i]).item() + 14
+        elif index >= 20 and index < 29:
+            out_index = torch.argmax(output_attr4[i]).item() + 20
+
+        if out_index == index:
             equalnum += 1
 
     return equalnum
 
-def train(attr_index, epoch, model, optimizer, train_loader):
+def train(epoch, model, optimizer, train_loader):
     model.train()
-    loss = fashionLoss(attr_index)
+    loss = fashionLoss()
     lr = 0
     for para in optimizer.param_groups:
         lr = para['lr']
 
     for batch_idx, (data, label) in enumerate(train_loader):
-        data, label = data.cuda(),label.cuda()
+        data, label = data.cuda(), label.cuda()
         optimizer.zero_grad()
         output = model(data)
+        #print(output)
+
+        #print(output[0].size())
+        #print(output[1].size())
+        #print(output[2].size())
+        #print(output[3].size())
+
         trainloss = loss(output, label)
         trainloss.backward()
         optimizer.step()
-        if batch_idx % 10 == 0:
-            print('Attribute: {}\tEpoch: {}\t[batch: {}/{}]\tBatch loss: {:.4f}\tlr: {:.5f}'.format(
-                attr_index, epoch, batch_idx, len(train_loader), trainloss.item(), lr))
+        if batch_idx % 20 == 0:
+            print('Epoch: {}\t[batch: {}/{}] Batch loss: {:.4f}\tlr: {:.5f}'.format(
+                epoch, batch_idx, len(train_loader), trainloss.item(), lr))
 
 
-def evaluate(attr_index, model, test_loader):
+def evaluate(model, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
-    loss = fashionLoss(attr_index)
+    loss = fashionLoss()
 
     for data, label in test_loader:
         data, label = data.cuda(),label.cuda()
         output = model(data)
         test_loss += loss(output, label).item()
-        correct += equal(attr_index, output, label)
+        correct += equal(output, label)
 
     test_loss /= len(test_loader)
     accuracy = 100. * correct / (len(test_loader) * test_loader.batch_size)
