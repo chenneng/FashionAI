@@ -26,15 +26,11 @@ class fashionLoss(nn.Module):
             softmax3 = F.softmax(output_attr3[i], dim = 0)
             softmax4 = F.softmax(output_attr4[i], dim = 0)
 
-            loss1 = -1.0 * torch.sum(torch.mul(torch.log(softmax1), label1))
-            loss2 = -1.0 * torch.sum(torch.mul(torch.log(softmax2), label2))
-            loss3 = -1.0 * torch.sum(torch.mul(torch.log(softmax3), label3))
-            loss4 = -1.0 * torch.sum(torch.mul(torch.log(softmax4), label4))
+            loss1 = -1.0 * torch.sum(torch.mul(torch.log(softmax1 + 1e-10), label1))
+            loss2 = -1.0 * torch.sum(torch.mul(torch.log(softmax2 + 1e-10), label2))
+            loss3 = -1.0 * torch.sum(torch.mul(torch.log(softmax3 + 1e-10), label3))
+            loss4 = -1.0 * torch.sum(torch.mul(torch.log(softmax4 + 1e-10), label4))
             loss += loss1 + loss2 + loss3 +loss4
 
-        #print(loss.item())
-        #print(torch.numel(output_attr1))
-        #print(output_attr1.size())
         size = list(output_attr1.size())
-        #print(size)
         return loss/size[0]

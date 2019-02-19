@@ -9,9 +9,10 @@ def equal(outputN, label):
     output_attr3 = outputN[2]
     output_attr4 = outputN[3]
 
+
     for i, output in enumerate(output_attr1):
         index = torch.argmax(label[i])
-        out_index = 30
+        out_index = 100
         if index >= 0 and index < 8:
             out_index = torch.argmax(output_attr1[i]).item()
         elif index >= 8 and index < 14:
@@ -37,12 +38,6 @@ def train(epoch, model, optimizer, train_loader):
         data, label = data.cuda(), label.cuda()
         optimizer.zero_grad()
         output = model(data)
-        #print(output)
-
-        #print(output[0].size())
-        #print(output[1].size())
-        #print(output[2].size())
-        #print(output[3].size())
 
         trainloss = loss(output, label)
         trainloss.backward()

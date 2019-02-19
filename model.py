@@ -68,7 +68,7 @@ class fashionModel(nn.Module):
         self.fc_pant_length_labels = nn.Linear(512 * block.expansion, 6)
         self.fc_skirt_length_labels = nn.Linear(512 * block.expansion, 6)
         self.fc_sleeve_length_labels = nn.Linear(512 * block.expansion, 9)
-        #self.fc = nn.Linear(512 * block.expansion, number_attr)
+
         nn.init.xavier_uniform(self.fc_coat_length_labels.weight)
         nn.init.constant(self.fc_coat_length_labels.bias, 0)
         nn.init.xavier_uniform(self.fc_pant_length_labels.weight)
@@ -121,13 +121,9 @@ class fashionModel(nn.Module):
         skirt_length_labels = self.fc_skirt_length_labels(x)
         sleeve_length_labels = self.fc_sleeve_length_labels(x)
 
-        # result = torch.cat((coat_length_labels, pant_length_labels, skirt_length_labels, sleeve_length_labels), 1)
-        #print(coat_length_labels.size())
-        #print(pant_length_labels.size())
-        #print(skirt_length_labels.size())
-        #print(sleeve_length_labels.size())
+        result = coat_length_labels, pant_length_labels, skirt_length_labels, sleeve_length_labels
 
-        return coat_length_labels, pant_length_labels, skirt_length_labels, sleeve_length_labels
+        return result
 
 def creat_model():
     resnet50 = models.resnet50(pretrained = True)

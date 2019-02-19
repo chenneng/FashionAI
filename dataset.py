@@ -22,15 +22,10 @@ class fashionData(Dataset):
         label_file = os.path.join(self.root_path, self.label_folder, self.train_label)
 
         csvdata = []
-        # with open(label_file) as f:
-        #     reader = csv.reader(f)
-        #     for row in reader:
-        #         if row[1] == attribute:
-        #             csvdata.append(row)
-
         with open(label_file) as f:
             reader = csv.reader(f)
             for row in reader:
+                if row[1] == 'coat_length_labels' or row[1] == 'pant_length_labels' or row[1] == 'skirt_length_labels' or row[1] == 'sleeve_length_labels':
                     csvdata.append(row)
         
         random.shuffle(csvdata)
